@@ -1,0 +1,16 @@
+* Generate Brownian tree images
+** Building a brownian tree
++ A seed is placed randomly somewhere on the screen.
++ A particle is placed randomly on the screen and is given a motion pattern(typically random)
++ When the particle collides with the seed or tree, its position is fixed, and it's considered to be the part of the tree.
+
+** TODO Writing the program
+Most of the stuff is straight forward.
+*** DONE random walk
+    CLOSED: [2017-03-15 Wed 15:05]
+Must have a better understanding of random states in clisp, Multidimensional Arrays.
+Making do with lists and simple built-in _random_ function.
+*** TODO image rendering
+Writing pgm format might be easy, but learning to work with svg might be better of computer generated images. So I'll have a look at svg libraries available for clisp.
+SVG is special xml file. With the tools available to write xml files svg becomes a lot better.
+Writing a svg library becomes very complicated, must use existing xml libraries. Just writing a subset of svg that will be required for this project.

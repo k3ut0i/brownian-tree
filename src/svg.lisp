@@ -23,6 +23,10 @@
    (image-header :accessor svg-image-header
                  :initarg :image-header
                  :initform (list (cons 0 0)))
+;; back ground color of the image
+   (bg-color :accessor svg-bg-color
+             :initarg :bg-color
+             :initform "white")
    (objects :accessor svg-objects
             :initarg :objects
             :initform nil))
@@ -48,7 +52,8 @@
 
 (defmethod draw ((a svg-path))
   (labels ((draw-segment (l r)
-             (format nil "<path fill=\"node\" stroke=\"black\" d=\"M~A,~AL~A,~A\" />"
+             (format nil "<path fill=\"node\" stroke=\"~A\" d=\"M~A,~AL~A,~A\" />"
+                     (svg-object-color a)
                      (car l) (cdr l)
                      (car r) (cdr r))))
     (loop :for i :in (path-points a)
@@ -60,9 +65,17 @@
 ;; TODO: complete the svg-render function.
 (defmethod draw ((a svg-image))
   (labels ((svg-render (h o)
-             (list (format nil "<svg height=\"~A\" width=\"~A\" >" (car (car h)) (cdr (car h)))
-                   (mapcar #'draw o)
-                   "</svg>")))
+             (let ((height (car (car h)))
+                   (width (cdr (car h))))
+               (list (format nil "<svg height=\"~A\" width=\"~A\" >" height width)
+                     (format nil "<polygon fill=\"~A\" stroke=\"none\" points=\"~A,~A ~A,~A ~A,~A ~A,~A\" />"
+                             (svg-bg-color a)
+                             0 0
+                             height 0
+                             height width
+                             0 width)
+                     (mapcar #'draw o)
+                     "</svg>"))))
     (list  (svg-xml-header a)
            (svg-doc-type a)
            (svg-render (svg-image-header a) (svg-objects a)))))
@@ -70,7 +83,7 @@
 (defun write-svg-to-file (filename svg-drawn-image)
   (with-open-file (svg-stream filename
                               :direction :output
-                              :if-exists :overwrite)
+                              :if-exists :supersede)
     (labels ((printer (a i)
                (cond ((null (car a)) t) 
                      ((atom (car a)) (progn

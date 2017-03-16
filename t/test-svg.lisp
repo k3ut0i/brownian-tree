@@ -1,15 +1,15 @@
-(defpackage :test-my-svg
+(defpackage :test-svg
   (:use :cl
-        :my-svg))
+        :svg))
 
-(in-package :test-my-svg)
+(in-package :test-svg)
 
 
-(let ((simple-image (make-instance 'my-svg:svg-image :image-header '((1000 . 1000)))))
-  (push (make-instance 'my-svg:svg-path
+(let ((simple-image (make-instance 'svg:svg-image :image-header '((1000 . 1000)))))
+  (push (make-instance 'svg:svg-path
                        :color "blue"
                        :points (loop :for i :upto 1000 :collect (cons i (+ 250 (random 500)))))
-        (my-svg:svg-objects simple-image))
-  (my-svg:write-svg-to-file "./test-image.svg"
-                            (my-svg:draw simple-image)))
+        (svg:svg-objects simple-image))
+  (svg:write-svg-to-file "./test-image.svg"
+                            (svg:draw simple-image)))
 

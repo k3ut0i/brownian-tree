@@ -1,16 +1,20 @@
 ;;; tools to write a SVG image file.
-(defpackage :my-svg
+(defpackage :svg
   (:use :cl)
-  (:export :svg-image
+  (:export :random-color
+           :svg-image
            :svg-path
            :svg-objects
            :draw
            :write-svg-to-file))
-(in-package :my-svg)
+(in-package :svg)
 
 (defconstant my-svg-xml-header "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>")
 (defconstant my-svg-doc-type 
   "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\" >")
+
+(defun random-color ()
+  (nth (random 129) '(:aliceblue  :aqua :aquamarine :azure :beige :bisque :black :blanchedalmond :blue :blueviolet :brown :burlywood :cadetblue :chartreuse :chocolate :coral :cornflowerblue :cornsilk :crimson :cyan :darkblue :darkcyan :darkgoldenrod :darkgray :darkgreen :darkkhaki :darkmagenta :darkolivegreen :darkorange :darkorchid :darkred :darksalmon :darkseagreen :darkslateblue :darkslategray :darkturquoise :darkviolet :deeppink :deepskyblue :dodgerblue :firebrick  :forestgreen :fuchsia :gainsboro  :gold :goldenrod  :green :greenyellow :honeydew :hotpink :indianred :indigo :khaki :lavender :lavenderblush :lawngreen :lemonchiffon :lightblue :lightcyan :lightgoldenrodyellow  :lightgreen :lightpink :lightsalmon :lightseagreen :lightskyblue :lightslategray :lightsteelblue :lightyellow :lime :limegreen :linen :magenta :maroon :mediumaquamarine :mediumblue :mediumorchid :mediumpurple :mediumseagreen :mediumslateblue :mediumspringgreen :mediumturquoise :mediumvioletred :midnightblue :mintcream :mistyrose :moccasin :navy :oldlace :olive :olivedrab :orange :orangered :orchid :palegoldenrod :palegreen :paleturquoise :palevioletred :papayawhip :peachpuff :peru :pink :plum :powderblue :purple :rebeccapurple :red :rosybrown :royalblue :saddlebrown :salmon :sandybrown :seagreen :seashell :sienna :silver :skyblue :slateblue :slategray  :springgreen :steelblue :tan :teal :thistle :tomato :turquoise :violet :wheat :yellow :yellowgreen)))
 
 (defclass svg-image ()
   ((xml-header :accessor svg-xml-header

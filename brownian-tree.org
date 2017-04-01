@@ -1,23 +1,14 @@
-* Generate Brownian tree images
-** Building a brownian tree
-+ A seed is placed randomly somewhere on the screen.
-+ A particle is placed randomly on the screen and is given a motion pattern(typically random)
-+ When the particle collides with the seed or tree, its position is fixed, and it's considered to be the part of the tree.
+* Brownian Tree
+A program to generate a brownian tree
+** Problem Statement
 
-** TODO Writing the program
-Most of the stuff is straight forward.
-*** TODO tree buffer
-checking if the new step connects to the tree becomes costly for very large tree around sizes 40000 etc...
-so it might be better to compress the walk to set of points that make the walk and then add the points to *tree* set.
-Compressing or using a set is also very slow. It might be better to use 2x2 arrays with boolean values to keep track of which points belong to the tree. Writing a full tree-class might be a better way.
-*** DONE random walk
-    CLOSED: [2017-03-15 Wed 15:05]
-Must have a better understanding of random states in clisp, Multidimensional Arrays.
-Making do with lists and simple built-in _random_ function.
-*** DONE image rendering
-    CLOSED: [2017-03-15 Wed 22:13]
-Writing pgm format might be easy, but learning to work with svg might be better of computer generated images. So I'll have a look at svg libraries available for clisp.
-SVG is special xml file. With the tools available to write xml files svg becomes a lot better.
-Writing a svg library becomes very complicated, must use existing xml libraries. Just writing a subset of svg that will be required for this project.
-*** Loading the program
-Push the project directory name to asdf:*central-registory* and the load it with (ql:quickload :project-name)
+** writing the program.
+*** visualization
+visualizing brownian walks worked really well in svg format because they are just a collection of line segments. but brownian tree is a collection of slightly touching particles so the particle must be a circle with just enough radius so it looks touched with it's neighbours.
+a few points to consider.
++ _What does the tree look like, if the particles are square shaped?_
++ or different polygon shaped?
++ if a particle can have more than 8 neighbours?
+*** TODO testing
+Complete test suites for _svg_ _brownian-trails_ and _brownian-tree_ packages.
+Adding new features and debugging the whole project becomes a hassle. When adding a new feature to svg package, add a corresponding test to test-suite and it's taken care off. Jumping between packages takes a lot of time to debug.

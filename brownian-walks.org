@@ -1,0 +1,29 @@
+* Generate Brownian Walk images
+This part of the program was a result of me misunderstanding the actual process of brownian tree, but the result is visually compelling so this part is left as it is and was not scrubbed.
+** real life analogy for this problem
+A dog is searching for a treasure, when it finds the treasure it stops. The next dog just needs to find the trail of one of the previous trails.
+** visualizing brownian walks.
++ A seed is placed randomly somewhere on the screen.
++ A particle is placed randomly on the screen and is given a motion pattern(typically random)
++ When the particle collides with the seed or tree, the whole walk is fixed and drawn.
+
+** TODO Writing the program
+Most of the stuff is straight forward.
+*** coloring and labelling
+There is an option to introduce variable number of branches so coloring needs to be from a carefully selected group. Either bright on a dark background or dark colors on a white background. Each branch must also be labelled by color and the it's length. Push the metadata to another variable when a walk is correctly found.
+*** DONE tree buffer
+    CLOSED: [2017-03-16 Thu 16:48]
+checking if the new step connects to the tree becomes costly for very large tree around sizes 40000 etc...
+so it might be better to compress the walk to set of points that make the walk and then add the points to *tree* set.
+Compressing or using a set is also very slow. It might be better to use 2x2 arrays with boolean values to keep track of which points belong to the tree. Writing a full tree-class might be a better way.
+*** DONE random walk
+    CLOSED: [2017-03-15 Wed 15:05]
+Must have a better understanding of random states in clisp, Multidimensional Arrays.
+Making do with lists and simple built-in _random_ function.
+*** DONE image rendering
+    CLOSED: [2017-03-15 Wed 22:13]
+Writing pgm format might be easy, but learning to work with svg might be better of computer generated images. So I'll have a look at svg libraries available for clisp.
+SVG is special xml file. With the tools available to write xml files svg becomes a lot better.
+Writing a svg library becomes very complicated, must use existing xml libraries. Just writing a subset of svg that will be required for this project.
+*** Loading the program
+Push the project directory name to asdf:*central-registory* and the load it with (ql:quickload :project-name)

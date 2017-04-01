@@ -21,35 +21,15 @@
    (bg-color :accessor bt-bg-color
              :initarg :bg-color
              :initform "black" )
-   (branches :accessor bt-branches
-             :initform nil)))
-
-(defclass bt-branch ()
-  ((color :accessor bt-branch-color
-          :initarg :color
-          :initform "black")
-   (points :accessor bt-branch-points
-           :initarg :points)))
+   (size :accessor bt-size
+         :initform 0)))
 
 (defmethod initialize-instance :after ((tree brownian-tree) &rest args)
   args
   (setf (bt-buffer tree) (make-array (list (bt-width tree)
                                            (bt-height tree))
-                                     :element-type 'bit
+                                     :element-type 'number
                                      :initial-element 0)))
-
-(defun draw-tree (btree filename)
-  (let* ((width (bt-width btree))
-         (height (bt-height btree))
-         (background-color (bt-bg-color btree))
-         (image (make-instance 'svg:svg-image 
-                               :image-header (list (cons width height))
-                               :bg-color background-color)))
-    (dolist (b (bt-branches btree))
-      (push (make-instance 'svg:svg-path 
-                           :points (bt-branch-points b)
-                           :color (svg:random-color)) (svg:svg-objects image)))
-    (svg:write-svg-to-file filename (svg:draw image))))
 
 (defun in-bounds-p (c tree)
   "if the point C is out of our range"
@@ -62,6 +42,7 @@
          (and (> y 0)
               (< y y-max)))))
 
+;; does the particle touch the tree?
 (defun on-tree (c tree)
   "is the point C on the tree T"
   (let ((x (car c))
@@ -77,14 +58,19 @@
           (+ (1- y) (random 3)))))
 
 (defun random-point (tree)
-  "return a random point in the range of the tree"
-  (cons (random (bt-width tree))
-        (random (bt-height tree))))
+  "return a random point in the range of the tree and not on the tree."
+  (let ((x (cons (random (bt-width tree))
+                 (random (bt-height tree)))))
+    (if (on-tree x tree)
+        (random-point tree)
+        x)))
 
 (defun update-point (c tree)
   "update a point C to the tree T"
-  (setf (aref (bt-buffer tree)(car c) (cdr c)) 1))
+  (incf (bt-size tree))
+  (setf (aref (bt-buffer tree)(car c) (cdr c)) (bt-size tree)))
 
+;; mainly for debugging.
 (defun coverage (tree)
   "points which are covered by the TREE"
   (let ((result 0))
@@ -92,32 +78,51 @@
         ((>= x (bt-width tree)))
       (do ((y 0 (1+ y)))
           ((>= y (bt-height tree)))
-        (if (eql 1 (aref (bt-buffer tree) x y)) (incf result))))
+        (if (> (aref (bt-buffer tree) x y) 0) (incf result))))
     result))
 
+;; TODO
 (defun new-particle (tree)
-  "introduce a particle and if it meets the tree T, draw the walk else discard the particle"
+  "introduce a particle and if it meets the tree T, update tree T else discard the particle"
   (let* ((c (random-point tree))
-         (walk nil)
-         (initial-point c))
+         (prev-c nil))
     (loop 
        :while (and (in-bounds-p c tree)
                    (not (on-tree c tree)))
-       :do (push c walk)
+       :do (setq prev-c c)
        :do (setq c (random-step c)))
     (cond ((in-bounds-p c tree)
-           (format t "found a walk: ~A length~%" (length walk))
-           (loop :for i :in walk :do (update-point i tree))
-           (push (make-instance 'bt-branch :points walk) (bt-branches tree))
-           t)
-          (t 
-           (format t "out of bounds: ~A steps, from ~A to ~A.~%"
-                   (length walk) initial-point c)
-           nil))))
+           (format t ".")
+           (update-point prev-c tree)
+           prev-c)
+          (t nil))))
 
-(defun create-tree (&key initial-seed num-branches)
-  (let ((ct (make-instance 'brownian-tree)))
-    (update-point initial-seed ct)
-    (dotimes (i num-branches)
-      (loop :until (new-particle ct)))
-    ct))
+(defun create-new-tree (&optional 
+                        (size '(1000 1000 2000))
+                        (initial-seed '((500 . 500)))
+                        (bg-color "white"))
+  (let ((x (make-instance 'brownian-tree 
+                          :width (first size)
+                          :height (second size)
+                          :bg-color bg-color))
+        (n (third size)))
+    (dolist (e initial-seed) (update-point e x))
+    (dotimes (i n)
+      (loop :until (new-particle x)))
+    x))
+
+(defun draw-tree (tree filename)
+  (let* ((width (bt-width tree))
+         (height (bt-height tree))
+         (background-color (bt-bg-color tree))
+         (image (make-instance 'svg:svg-image
+                               :image-header (list (cons width height))
+                               :bg-color background-color)))
+    (dotimes (x width)
+      (dotimes (y height)
+        (when (on-tree (cons x y) tree)
+          (push (make-instance 'svg:svg-circle
+                               :radius "0.6"
+                               :center (cons x y))
+                (svg:svg-objects image)))))
+    (svg:write-svg-to-file filename (svg:draw image))))

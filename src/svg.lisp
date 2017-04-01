@@ -4,13 +4,24 @@
   (:export :random-color
            :svg-image
            :svg-path
+           :svg-circle
            :svg-objects
+           :svg-tags
            :draw
            :write-svg-to-file))
 (in-package :svg)
 
-(defconstant my-svg-xml-header "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>")
-(defconstant my-svg-doc-type 
+
+(defparameter svg-namespace
+  "http://www.w3.org/2000/svg")
+(defparameter svg-public-identifier
+  "PUBLIC \"-//W3C//DTD SVG 1.1//EN\"")
+(defparameter svg-system-identifier
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd")
+
+;; only change if svg needs to be revamped.
+(defparameter my-svg-xml-header "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>")
+(defparameter my-svg-doc-type 
   "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\" >")
 
 (defun random-color ()
@@ -33,7 +44,11 @@
              :initform "white")
    (objects :accessor svg-objects
             :initarg :objects
-            :initform nil))
+            :initform nil)
+;; tags to label a few objects by color. (("string" . color))
+   (tags :accessor svg-tags
+         :initarg :tags
+         :initform nil))
   )
 
 
@@ -65,12 +80,33 @@
        :collect (draw-segment previous i)
        :do (setq previous i))))
 
+(defclass svg-circle (svg-object)
+  ((center :accessor center
+           :initarg :center)
+   (radius :accessor radius
+           :initarg :radius)))
+
+(defmethod draw ((a svg-circle))
+  (format nil
+          "<circle fill=\"~A\" stroke=\"~A\" radius=\"~A\" center=\"~A,~A\" />"
+          (svg-object-fill a)
+          (svg-object-color a)
+          (radius a)
+          (car (center a))
+          (cdr (center a))))
 
 ;; TODO: complete the svg-render function.
 (defmethod draw ((a svg-image))
-  (labels ((svg-render (h o)
-             (let ((height (car (car h)))
-                   (width (cdr (car h))))
+  (labels ((render-tag (a num)
+             (format nil
+                     "<text text-anchor=\"right\" stroke=\"~A\" x=\"870\" y=\"~A\">~A</text>~%"
+                     (car (cdr a))
+                     (+ 15 (* num 15))
+                     (car a)))
+           (svg-render (i)
+             (let ((height (car (car (svg-image-header i))))
+                   (width (cdr (car (svg-image-header i))))
+                   (tags (svg-tags i)))
                (list (format nil "<svg height=\"~A\" width=\"~A\" >" height width)
                      (format nil "<polygon fill=\"~A\" stroke=\"none\" points=\"~A,~A ~A,~A ~A,~A ~A,~A\" />"
                              (svg-bg-color a)
@@ -78,11 +114,14 @@
                              height 0
                              height width
                              0 width)
-                     (mapcar #'draw o)
+                     (loop :for i :in tags :with c = 0
+                        :collect (render-tag i c)
+                        :do (incf c))
+                     (mapcar #'draw (svg-objects i))
                      "</svg>"))))
     (list  (svg-xml-header a)
            (svg-doc-type a)
-           (svg-render (svg-image-header a) (svg-objects a)))))
+           (svg-render a))))
 
 (defun write-svg-to-file (filename svg-drawn-image)
   (with-open-file (svg-stream filename

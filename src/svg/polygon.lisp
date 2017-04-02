@@ -1,6 +1,7 @@
 (defpackage :svg.polygon
   (:use :cl
-        :svg.object))
+        :svg.object)
+  (:export :polygon))
 
 (in-package :svg.polygon)
 
@@ -22,7 +23,7 @@
                                    (reduce #'concat-with-space
                                            (mapcar #'point-to-string (points obj)))))))
     
-(defmethod svg.object.draw ((polygon-object polygon))
+(defmethod svg.object:draw ((polygon-object polygon))
   (flet ((concat-with-space (a b) (concat-with " " a b)))
     (reduce #'concat-with-space
             (mapcar (lambda (tag) (funcall tag polygon-object))

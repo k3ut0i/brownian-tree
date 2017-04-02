@@ -60,7 +60,7 @@
               (svg:svg-objects image))
         (push (list (format nil "id:~A ln:~A" (bt-trail-id b) (bt-trail-length b)) color)
               (svg:svg-tags image))))
-    (svg:write-svg-to-file filename (svg:draw image))))
+    (svg:write-svg-to-file filename (svg:draw-svg-image image))))
 
 (defun in-bounds-p (c bt)
   "if the point C is out of our range"

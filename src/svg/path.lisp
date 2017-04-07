@@ -22,10 +22,8 @@
     (let ((head-string  (format nil "M ~A ~A"
                                          (caar (points obj))
                                          (cdar (points obj))))
-          (tail-string (reduce (lambda (a b) (format nil "~A ~A"
-                                        (point-to-string a)
-                                        (point-to-string b)))
-                               (cdr (points obj)))))
+          (tail-string (reduce (lambda (a b) (format nil "~A ~A" a b))
+                               (mapcar #'point-to-string (cdr (points obj))))))
       (setf (points-tag obj) (format nil "d=\"~A ~A\"" head-string tail-string)))))
 
 (defmethod svg.object:draw ((obj path))

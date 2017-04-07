@@ -10,6 +10,10 @@
                                      (:file "brownian-trails"
                                             :depends-on ("svg"))
                                      (:file "svg/object")
+                                     (:file "svg/text"
+                                            :depends-on ("svg/object"))
+                                     (:file "svg/rect"
+                                            :depends-on ("svg/object"))
                                      (:file "svg/polygon"
                                             :depends-on ("svg/object"))
                                      (:file "svg/path"

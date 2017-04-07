@@ -18,6 +18,9 @@
 (in-package :svg)
 
 ;; How do i re-export svg.* files just through (:use :svg)????
+;; What format for numbers does svg use??
+;; lisp outputs numbers like 0.000d0 etc.. are these valid values??
+;; image comes out fine i suppose, so does it matter?
 
 (defparameter svg-namespace
   "http://www.w3.org/2000/svg")
@@ -43,7 +46,7 @@
 ;; dimensions of the image file and other attrnibutes
    (image-size :accessor image-size
                :initarg :image-size
-               :initform (list (cons 0 0)))
+               :initform (cons 0 0))
 ;; back ground color of the image
    (bg-color :accessor bg-color
              :initarg :bg-color
@@ -65,7 +68,6 @@
           svg-start-tag
           (mapcar #'draw (objects img))
           svg-end-tag)))
-;; place holder
 
 (defun write-svg-to-file (filename obj)
   (with-open-file (svg-stream filename

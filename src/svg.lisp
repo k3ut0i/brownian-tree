@@ -9,6 +9,7 @@
   (:export :random-color
            :write-svg-to-file
 	   :objects
+	   :svg-image
 	   ))
 (in-package :svg)
 

@@ -2,7 +2,8 @@
   (:use :cl
         :svg
 	:svg.path
-	:svg.text)
+	:svg.text
+	:svg.rect)
   (:nicknames :btrails)
   (:export :new-particle
            :create-btrails
@@ -55,21 +56,18 @@
                                :image-size (cons width height)
                                :bg-color background-color)))
     (dolist (b (bt-trails bt))
-      (let ((color (svg:random-color)))
+      (let ((color (random-color)))
         (push (make-instance 'path 
                              :points (bt-trail-points b)
                              :stroke-color color)
-              (svg:objects image))
-
-        (push (make-instance 'text
-			     :text-pos (cons (* 0.9 width)
-					     (* 0.01 height))
-			     :content (format nil "id:~A ln:~A"
-					      (bt-trail-id b)
-					      (bt-trail-length b))
-			     :fill-color color)
-	      
               (svg:objects image))))
+    (push (make-instance 'rect ; for background
+			 :small-point '(0 . 0)
+			 :width width
+			 :height height
+			 :fill-color background-color)
+	  (svg:objects image))
+
     (write-svg-to-file filename image)))
 
 (defun in-bounds-p (c bt)

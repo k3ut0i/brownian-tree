@@ -2,3 +2,6 @@
 *\~
 *.fasl
 *.svgz
+!test-svg-image-out.svg
+!trails*
+!low-density-sample.svg

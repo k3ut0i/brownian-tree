@@ -7,14 +7,9 @@
         :svg.circle
         :svg.ellipse)
   (:export :random-color
-           :svg-image
-           :svg-path
-           :svg-circle
-           :svg-objects
-           :svg-tags
-           :draw
-           :draw-svg-image
-           :write-svg-to-file))
+           :write-svg-to-file
+	   :objects
+	   ))
 (in-package :svg)
 
 ;; How do i re-export svg.* files just through (:use :svg)????
@@ -55,7 +50,7 @@
             :initarg :objects
             :initform nil)))
 
-(defun draw-svg-image (img)
+(defmethod draw-svg-image ((img svg-image))
   "convert svg-image object into a list of tags"
   (let* ((x-size (car (image-size img)))
          (y-size (cdr (image-size img)))

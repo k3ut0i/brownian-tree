@@ -4,7 +4,7 @@
   :version "1.0.0"
   :components ((:module "src"
                         :components ((:file "svg"
-                                            :depends-on ("svg/object" "svg/polygon" "svg/path" "svg/ellipse" "svg/circle"))
+                                            :depends-on ("svg/object" "svg/polygon" "svg/path" "svg/ellipse" "svg/circle" "svg/text"))
                                      (:file "brownian-tree"
                                             :depends-on ("svg"))
                                      (:file "brownian-trails"

@@ -4,11 +4,11 @@ A program to generate a brownian tree
 
 ** writing the program.
 *** visualization
-visualizing brownian walks worked really well in svg format because they are just a collection of line segments. but brownian tree is a collection of slightly touching particles so the particle must be a circle with just enough radius so it looks touched with it's neighbours.
+visualizing brownian walks worked really well in svg format because they are just a collection of line segments. but brownian tree is a collection of slightly touching particles so the particle must be a circle with just enough radius so it looks touched with it's neighbors.
 a few points to consider.
 + _What does the tree look like, if the particles are square shaped?_
 + or different polygon shaped?
-+ if a particle can have more than 8 neighbours?
-*** TODO testing
++ if a particle can have more than 8 neighbors?
+*** testing
 Complete test suites for _svg_ _brownian-trails_ and _brownian-tree_ packages.
 Adding new features and debugging the whole project becomes a hassle. When adding a new feature to svg package, add a corresponding test to test-suite and it's taken care off. Jumping between packages takes a lot of time to debug.

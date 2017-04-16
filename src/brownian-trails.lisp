@@ -1,12 +1,14 @@
 (defpackage :brownian-trails
   (:use :cl
-        :svg)
+        :svg
+	:svg.path
+	:svg.text)
   (:nicknames :btrails)
   (:export :new-particle
            :create-btrails
            :brownian-trails
            :update-point
-           :draw-tree))
+           :draw-brownian-trails))
 
 (in-package :brownian-trails)
 
@@ -45,22 +47,30 @@
    (points :accessor bt-trail-points
            :initarg :points)))
 
-(defun draw-tree (bt filename)
+(defun draw-brownian-trails (bt filename)
   (let* ((width (bt-width bt))
          (height (bt-height bt))
          (background-color (bt-bg-color bt))
          (image (make-instance 'svg:svg-image 
-                               :image-header (list (cons width height))
+                               :image-size (cons width height)
                                :bg-color background-color)))
     (dolist (b (bt-trails bt))
       (let ((color (svg:random-color)))
-        (push (make-instance 'svg:svg-path 
+        (push (make-instance 'path 
                              :points (bt-trail-points b)
-                             :color color)
-              (svg:svg-objects image))
-        (push (list (format nil "id:~A ln:~A" (bt-trail-id b) (bt-trail-length b)) color)
-              (svg:svg-tags image))))
-    (svg:write-svg-to-file filename (svg:draw-svg-image image))))
+                             :stroke-color color)
+              (svg:objects image))
+
+        (push (make-instance 'text
+			     :text-pos (cons (* 0.9 width)
+					     (* 0.01 height))
+			     :content (format nil "id:~A ln:~A"
+					      (bt-trail-id b)
+					      (bt-trail-length b))
+			     :fill-color color)
+	      
+              (svg:objects image))))
+    (write-svg-to-file filename image)))
 
 (defun in-bounds-p (c bt)
   "if the point C is out of our range"
@@ -131,8 +141,11 @@
                    (length walk) initial-point c)
            nil))))
 
-(defun create-btrails (&key initial-seed num-trails bg-color)
-  (let ((ct (make-instance 'brownian-trails :bg-color bg-color)))
+(defun create-btrails (&key initial-seed num-trails bg-color size)
+  (let ((ct (make-instance 'brownian-trails
+			   :bg-color bg-color
+			   :width (car size)
+			   :height (cdr size))))
     (update-point initial-seed ct)
     (dotimes (i num-trails)
       (loop :until (new-particle ct)))

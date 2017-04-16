@@ -98,9 +98,9 @@
           (t nil))))
 
 (defun create-new-tree (&optional 
-                        (size '(1000 1000 2000))
-                        (initial-seed '((500 . 500)))
-                        (bg-color "white"))
+			  (size '(1000 1000 2000))
+			  (initial-seed '((500 . 500)))
+			  (bg-color "white"))
   (let ((x (make-instance 'brownian-tree 
                           :width (first size)
                           :height (second size)
@@ -110,19 +110,3 @@
     (dotimes (i n)
       (loop :until (new-particle x)))
     x))
-
-(defun draw-tree (tree filename)
-  (let* ((width (bt-width tree))
-         (height (bt-height tree))
-         (background-color (bt-bg-color tree))
-         (image (make-instance 'svg:svg-image
-                               :image-header (list (cons width height))
-                               :bg-color background-color)))
-    (dotimes (x width)
-      (dotimes (y height)
-        (when (on-tree (cons x y) tree)
-          (push (make-instance 'svg:svg-circle
-                               :radius "0.6"
-                               :center (cons x y))
-                (svg:svg-objects image)))))
-    (svg:write-svg-to-file filename (svg:draw image))))

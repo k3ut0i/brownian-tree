@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
+<svg width="100" height="100" viewBox="0 0 100 100" >
+ <text fill="magneta" x="40" y="5" > testing svg library </text>
+ <path stroke="black" fill="white" d="M 0 100 L 100 0" />
+ <ellipse stroke="blue" fill="red" cx="25" cy="25" rx="4" ry="3" />
+ <circle stroke="green" fill="blue" cx="10" cy="90" r="7" />
+ <rect stroke="darkred" fill="black" x="20" y="30" width="10" height="5" />
+ <polygon stroke="red" fill="white" points="57.60845213036123d0,52.47213595499958d0 50.0,58.0 42.39154786963877d0,52.47213595499958d0 45.29771798166021d0,43.52786404500042d0 54.70228201833979d0,43.52786404500042d0" />
+ <polygon stroke="cyan" fill="white" points="36.28427587261303d0,63.34565303179429d0 35.66987298107781d0,57.5d0 41.0395584540888d0,55.10926199633097d0 44.97260947684137d0,59.47735768366173d0 42.033683215379d0,64.567727288213d0" />
+ <polygon stroke="lightgreen" fill="white" points="60.62373507245328d0,42.93444280220142d0 57.401923788646684d0,41.5d0 57.77056552356782d0,37.992608180923426d0 61.2202099292274d0,37.2593636270722d0 62.98356568610482d0,40.31358538980296d0" />
+ <polygon stroke="steelblue" fill="white" points="26.195773934819385d0,68.76393202250021d0 30.0d0,66.0d0 33.804226065180615d0,68.76393202250021d0 32.35114100916989d0,73.23606797749979d0 27.648858990830107d0,73.23606797749979d0" />
+</svg>

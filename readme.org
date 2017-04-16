@@ -1,0 +1,15 @@
+* Brownian Tree builder
+This is a common lisp program to visualize Brownian Trees and Random Walk trails with a lot of variable parameters available to make the resulting more interesting.
+Look at brownian-tree.org and brownian-trails.org files for more details on the implementation.
+The Image creation part of the program is written as a separate SVG module, whose capabilities are limited to the requirements of the current project.
+
+Few sample brownian-tree images.
+todo:
+
+Few sample brownian-trails images.
+[[https://raw.githubusercontent.com/k3ut0i/brownian-tree/master/low-density-sample.svg][low density sample]] 120x90 with 5 trails and initial seed at 60.45
+
+
+Bugs:
++ some thing weird going on with path background.
++ path initialize-instance must not be that nightmare. need to make it more streamlined, or break it into fewer parts if memory insufficient. It might be better to used advanced pretty printing of format.

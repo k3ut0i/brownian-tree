@@ -10,6 +10,6 @@
   :depends-on (:prove
                :brownian-tree)
   :components ((:module "t"
-                        :components ((:file "new-brownian-tree")
+                        :components ((:file "generate-brownian-trails")
                                      (:file "test-svg")
                                      (:file "validate-svg")))))

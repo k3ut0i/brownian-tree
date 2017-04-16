@@ -16,15 +16,20 @@
    (points-tag :accessor points-tag)))
 
 ;; TODO: provide options for path types other than just line segments.
+;; time saving concat operations needed. just creating the strings is taking too long
 (defmethod initialize-instance :after ((obj path) &rest args)
   (null args)
-  (flet ((point-to-string (p) (format nil "L ~A ~A" (car p) (cdr p))))
-    (let ((head-string  (format nil "M ~A ~A"
-                                         (caar (points obj))
-                                         (cdar (points obj))))
-          (tail-string (reduce (lambda (a b) (format nil "~A ~A" a b))
-                               (mapcar #'point-to-string (cdr (points obj))))))
-      (setf (points-tag obj) (format nil "d=\"~A ~A\"" head-string tail-string)))))
+  (cond ((eql (length (points obj)) 1) (setf (points-tag obj) (format nil "d=\"M ~A ~A L ~A ~A\""
+								      (caar (points obj)) (cdar (points obj))
+								      (caar (points obj)) (cdar (points obj)))))
+	((eql (length (points obj)) 0) (setf (points-tag obj) "d=\"\""))
+	(t (flet ((point-to-string (p) (format nil "L ~A ~A" (car p) (cdr p))))
+	     (let ((head-string  (format nil "M ~A ~A"
+					 (caar (points obj))
+					 (cdar (points obj))))
+		   (tail-string (reduce (lambda (a b) (format nil "~A ~A" a b))
+					(mapcar #'point-to-string (cdr (points obj))))))
+	       (setf (points-tag obj) (format nil "d=\"~A ~A\"" head-string tail-string)))))))
 
 (defmethod svg.object:draw ((obj path))
   (flet ((concat-with-space (a b) (format nil "~A ~A" a b)))

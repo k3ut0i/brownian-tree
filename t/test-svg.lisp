@@ -29,7 +29,9 @@
     (translate center (rotate angle (regular-hexagon radius)))))
 
 (defparameter *test-draw-path-cases*
-  '(((:points ((1 . 1) (2 . 2) (3 . 3)) :stroke "red" :fill "green" :type :straight-line)
+  '(((:points ((1 . 1)))
+     . "<path stroke=\"black\" fill=\"white\" d=\"M 1 1 L 1 1\" />")
+    ((:points ((1 . 1) (2 . 2) (3 . 3)) :stroke "red" :fill "green" :type :straight-line)
      . "<path stroke=\"red\" fill=\"green\" d=\"M 1 1 L 2 2 L 3 3\" />")
     ((:points ((2.34 . 8.6) (3.32 . 9.1) (8.4 . 10.11)) :fill "blue")
      . "<path stroke=\"black\" fill=\"blue\" d=\"M 2.34 8.6 L 3.32 9.1 L 8.4 10.11\" />"))
@@ -184,7 +186,8 @@
   (mapcar (lambda (c) (is (test-draw-svg-text (car c)) (cdr c)))
           *test-draw-text-cases*))
 
-(subtest "drawing a sample image using all elements: check manually"
-  ; just one for now.
+(subtest "drawing a sample image using all elements"
+					; just one for now.
+  (diag "view svg image file \"test-svg-image-out.svg\" and manually check if the image is drawn correctly")
   (is (test-draw-svg-image (car *test-draw-image-cases*)) nil))
 (finalize)

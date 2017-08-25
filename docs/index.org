@@ -1,0 +1,4 @@
+* Visualizing Brownian Motion
+
+[[file:brownian-tree.org][trees]]
+[[file:brownian-walks.org][walks]]

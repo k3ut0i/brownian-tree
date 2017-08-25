@@ -4,8 +4,9 @@ Look at brownian-tree.org and brownian-trails.org files for more details on the 
 The Image creation part of the program is written as a separate SVG module, whose capabilities are limited to the requirements of the current project.
 
 Few sample brownian-tree images.
-todo:
+[[file:trails-1200x900-600dot450-10.svgz][Trails Sample Image]]
 
+** TODO Features
 Few sample brownian-trails images.
 look at trails-*-svgz images in root folder. gzipped svg image has a lot of variables so it might load the cpu up.
 

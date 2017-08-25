@@ -3,8 +3,15 @@
 (defsystem "brownian-tree"
   :version "1.0.0"
   :components ((:module "src"
-                        :components ((:file "svg"
-                                            :depends-on ("svg/object" "svg/polygon" "svg/path" "svg/ellipse" "svg/circle" "svg/text" "svg/rect"))
+                        :components ((:file "color")
+				     (:file "svg"
+                                            :depends-on ("svg/object"
+							 "svg/polygon"
+							 "svg/path"
+							 "svg/ellipse"
+							 "svg/circle"
+							 "svg/text"
+							 "svg/rect"))
                                      (:file "brownian-tree"
                                             :depends-on ("svg"))
                                      (:file "brownian-trails"

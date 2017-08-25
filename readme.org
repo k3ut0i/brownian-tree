@@ -4,7 +4,8 @@ Look at brownian-tree.org and brownian-trails.org files for more details on the 
 The Image creation part of the program is written as a separate SVG module, whose capabilities are limited to the requirements of the current project.
 
 Few sample brownian-tree images.
-[[file:trails-1200x900-600dot450-10.svgz][Trails Sample Image]]
+[[file:low-desity-sample.svg][sample 120x90]]
+[[file:sample.png][sample 1200x900]]
 
 ** TODO Features
 Few sample brownian-trails images.

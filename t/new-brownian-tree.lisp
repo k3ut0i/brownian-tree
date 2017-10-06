@@ -6,9 +6,9 @@
 
 (defun create-new-bt ()
   "create a new brownian tree"
-  (let ((st (make-instance 'bt:brownian-tree)))
-    (bt:update-point (cons 500 500) st)
-    (bt:new-particle st)))
+  (let ((st (make-instance 'brownian-tree:brownian-tree)))
+    (brownian-tree:update-point (cons 500 500) st)
+    (brownian-tree:new-particle st)))
 ;; (let* ((rw (make-instance 'svg:svg-image :image-header (list (cons 1000 1000))))
 ;;        (walk1 nil) (walk2 nil) (walk3 nil) (walk4 nil) (walk5 nil) (walk6 nil) (walk7 nil)
 ;;        (debug t))

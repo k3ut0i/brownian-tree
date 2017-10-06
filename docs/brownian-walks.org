@@ -27,3 +27,10 @@ SVG is special xml file. With the tools available to write xml files svg becomes
 Writing a svg library becomes very complicated, must use existing xml libraries. Just writing a subset of svg that will be required for this project.
 *** Loading the program
 Push the project directory name to asdf:*central-registory* and the load it with (ql:quickload :project-name)
+
+** Samples
+#+CAPTION: A low density walk 100x100.
+[[file:low-density-sample.png]]
+
+#+CAPTION: A high density walk 1200x900.
+[[file:sample.png]]

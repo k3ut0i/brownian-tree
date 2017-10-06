@@ -1,31 +1,38 @@
 (in-package :asdf-user)
+(defvar +proj-version+ "0.1.0")
 
-(defsystem "brownian-tree"
-  :version "1.0.0"
+(defsystem "svg"
+  :version +proj-version+
+  
   :components ((:module "src"
-                        :components ((:file "color")
-				     (:file "svg"
-                                            :depends-on ("svg/object"
-							 "svg/polygon"
-							 "svg/path"
-							 "svg/ellipse"
-							 "svg/circle"
-							 "svg/text"
-							 "svg/rect"))
-                                     (:file "brownian-tree"
-                                            :depends-on ("svg"))
-                                     (:file "brownian-trails"
-                                            :depends-on ("svg"))
-                                     (:file "svg/object")
-                                     (:file "svg/text"
-                                            :depends-on ("svg/object"))
-                                     (:file "svg/rect"
-                                            :depends-on ("svg/object"))
-                                     (:file "svg/polygon"
-                                            :depends-on ("svg/object"))
-                                     (:file "svg/path"
-                                            :depends-on ("svg/object"))
-                                     (:file "svg/ellipse"
-                                            :depends-on ("svg/object"))
-                                     (:file "svg/circle"
-                                            :depends-on ("svg/object"))))))
+			:serial t
+			:components ((:file "svg/object")
+				     (:file "svg/text")
+				     (:file "svg/circle")
+				     (:file "svg/ellipse")
+				     (:file "svg/rect")
+				     (:file "svg/polygon")
+				     (:file "svg/path")
+				     (:file "svg")
+				     (:file "color")))))
+(defsystem "brownian-tree"
+  :version +proj-version+
+  :depends-on ("svg")
+  :components ((:module "src"
+                        :components ((:file "brownian-tree")))))
+
+(defsystem "brownian-trails"
+  :version +proj-version+
+  :depends-on ("svg")
+  :components ((:module "src"
+			:components ((:file "brownian-trails")))))
+
+(defsystem "brownian-tree/test"
+  :depends-on ("brownian-tree"
+	       "brownian-trails"
+	       "svg"
+	       "prove")
+  :components ((:module "t"
+			:components ((:file "test-svg")
+				     (:file "generate-brownian-trails")
+				     (:file "new-brownian-tree")))))

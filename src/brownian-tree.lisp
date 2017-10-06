@@ -1,7 +1,6 @@
 (defpackage :brownian-tree
   (:use :cl
         :svg)
-  (:nicknames :bt)
   (:export :new-particle
            :brownian-tree
            :update-point

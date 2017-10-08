@@ -21,16 +21,20 @@
 ;; to a file.
 (defmethod initialize-instance :after ((obj path) &rest args)
   (null args)
-  (cond ((eql (length (points obj)) 1) (setf (points-tag obj) (format nil "d=\"M ~A ~A L ~A ~A\""
-								      (caar (points obj)) (cdar (points obj))
-								      (caar (points obj)) (cdar (points obj)))))
+  (cond ((eql (length (points obj)) 1)
+	 (setf (points-tag obj) (format nil "d=\"M ~A ~A L ~A ~A\""
+					(caar (points obj)) (cdar (points obj))
+					(caar (points obj)) (cdar (points obj)))))
 	((eql (length (points obj)) 0) (setf (points-tag obj) "d=\"\""))
 	(t (flet ((point-to-string (p) (format nil "L ~A ~A" (car p) (cdr p))))
 	     (let ((head-string  (format nil "M ~A ~A"
 					 (caar (points obj))
 					 (cdar (points obj))))
 		   (tail-string (mapcar #'point-to-string (cdr (points obj)))))
-	       (setf (points-tag obj) (format nil "d=\"~{~A~^ ~}\"" (cons head-string tail-string))))))))
+	       (setf (points-tag obj)
+		     (format nil
+			     "d=\"~{~A~^ ~}\""
+			     (cons head-string tail-string))))))))
 
 (defmethod svg.object:draw ((obj path))
   (flet ((concat-with-space (a b) (format nil "~A ~A" a b)))

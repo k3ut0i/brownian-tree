@@ -9,28 +9,57 @@
 (in-package :brownian-tree)
 
 (defclass brownian-tree ()
-  ((buffer :accessor bt-buffer
-           :initarg :buffer)
-   (width :accessor bt-width
-          :initarg :width
-          :initform 1000)
-   (height :accessor bt-height
-           :initarg :height
-           :initform 1000)
-   (bg-color :accessor bt-bg-color
-             :initarg :bg-color
-             :initform "black" )
-   (size :accessor bt-size
-         :initform 0)))
+  ((buffer :initarg :buffer
+	   :type (simple-array * *))
+   (width :initarg :width
+	  :type integer)
+   (height :initarg :height
+	   :type integer)
+   (bg-color :initarg :bg-color
+             :initform "black"
+	     :type (simple-array * *))
+   (size :initform 0))
+  (:documentation "Brownian Tree Object")
+  (:default-initargs :width 1000 :height 1000 :bg-color "black"))
 
 (defmethod initialize-instance :after ((tree brownian-tree) &rest args)
-  args
-  (setf (bt-buffer tree) (make-array (list (bt-width tree)
-                                           (bt-height tree))
-                                     :element-type 'number
-                                     :initial-element 0)))
+  (declare (ignore args))
+  (setf (slot-value tree 'buffer)
+	(make-array (list (slot-value tree 'width)
+			  (slot-value tree 'height))
+		    :element-type 'number
+		    :initial-element 0)))
 
-(defun in-bounds-p (c tree)
+(defun pprint-buffer (stream buffer
+		      &optional colon amp (delimiter #\Space))
+  "Dump BUFFER data."
+  (declare (type (simple-array integer *) buffer)
+	   (ignore colon amp)) ;; What am I actually ignoring?
+  (loop :with first-time t
+     :for x :across buffer
+     :unless first-time
+     :do (when delimiter (write-char delimiter stream)) :end
+     :do (princ x stream)))
+
+					;FIXME: Complete this method
+(defun draw-tree (tree file-name output-type)
+  "Draw the TREE to the output file FILE-NAME of type OUTPUT-TYPE."
+  (declare (type brownian-tree tree)
+	   (type (simple-array character *) file-name))
+  (with-open-file (outf file-name
+			:direction :output
+			:if-exists :supersede)
+    (case output-type
+      (:lisp-data (format outf "~A" tree))
+      (:netpbm-image (format outf "~' :@/pprint-buffer/"
+			     (slot-value tree 'buffer)))
+      (:svg-image (draw-svg-from-tree tree file-name)))))
+
+(defun draw-svg-from-tree (tree file-name)
+  "Draw svg image from the TREE object to FILE-NAME."
+  '())
+
+(defun in-bounds? (c tree)
   "if the point C is out of our range"
   (let ((x (car c))
         (y (cdr c))
@@ -42,7 +71,7 @@
               (< y y-max)))))
 
 ;; does the particle touch the tree?
-(defun on-tree (c tree)
+(defun on-tree? (c tree)
   "is the point C on the tree T"
   (let ((x (car c))
         (y (cdr c)))

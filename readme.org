@@ -10,7 +10,7 @@ Few sample brownian-tree images.
 ** TODO Features
 Few sample brownian-trails images.
 look at trails-*-svgz images in root folder. gzipped svg image has a lot of variables so it might load the cpu up.
-
+Try writing the path data to a file and rendering it into svg with javascript or other language with more svg support.
 
 Bugs:
 + [todo] some thing weird going on with path background.

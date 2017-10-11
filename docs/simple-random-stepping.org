@@ -1,0 +1,57 @@
+* Random motion generation
+
+When working with a simple co-ordinate system we have 8 possible choices for a random movement, think king moves on a chess board.
+
+Trying to get a simple process for enumerating these possibilities
+#+BEGIN_SRC lisp
+  (let ((x (1- (random 3)))
+	(y (1- (random 3))))
+    (vector x y))
+#+END_SRC
+
+#+RESULTS:
+| 0 | 0 |
+
+But the above process generates the no move state. 3x3 with 9 possibilities. We need the 8 required, which can be acquired by just iterating the process but the process is non-deterministic. Even though the probability of the number of iterations becomes exponentially small, I'm trying to get a deterministic process to work out.
+
+#+BEGIN_SRC lisp
+  ;; Pure manual enumeration
+  (case (random 8)
+    (0 #(-1 0))
+    (1 #(-1 1))
+    (2 #(0 1))
+    (3 #(1 1))
+    (4 #(1 0))
+    (5 #(1 -1))
+    (6 #(0 -1))
+    (7 #(-1 -1)))
+#+END_SRC
+
+#+RESULTS:
+| 0 | 1 |
+
+Does a mathematical process provide a better feature than manual emulation?
+#+BEGIN_SRC lisp
+  (let* ((r (random 8))
+	 (rn (if (< r 4)
+		 r
+		 (1+ r))))
+    (multiple-value-bind (x y) (floor rn 3)
+      (list rn (1- x) (1- y))))
+#+END_SRC
+
+#+RESULTS:
+| 3 | 0 | -1 |
+
+For dimensions greater than 2 how can the above process be generalized?
+#+BEGIN_SRC lisp
+  (defun random-step (n)
+    "Random step in the dimension N from the origin."
+    (let* ((num (1- (pow 3 n)))
+	   (r (random num))
+	   (rn (if (< r (/ num 2))
+		   r
+		   (1+ r))))
+      (multiple-value-bind (x y) (floor r 3) ; I need to find the trinary representation of r and return that value normalized 
+	(mapc #'(lambda (v) (1- v))) (list x y))))
+#+END_SRC

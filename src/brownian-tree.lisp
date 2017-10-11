@@ -61,10 +61,10 @@
 
 (defun in-bounds? (c tree)
   "if the point C is out of our range"
-  (let ((x (car c))
-        (y (cdr c))
-        (x-max (bt-width tree))
-        (y-max (bt-height tree)))
+  (let ((x (aref c 0))
+        (y (aref c 1))
+        (x-max (slot-value tree 'width))
+        (y-max (slot-value tree 'height)))
     (and (and (> x 0)
               (< x x-max))
          (and (> y 0)
@@ -73,68 +73,77 @@
 ;; does the particle touch the tree?
 (defun on-tree? (c tree)
   "is the point C on the tree T"
-  (let ((x (car c))
-        (y (cdr c)))
-    (not (zerop (aref (bt-buffer tree) x y)))))
+  (declare (type (simple-vector 2) c)
+	   (type brownian-tree tree))
+  (let ((x (aref c 0))
+        (y (aref c 1)))
+    (not (zerop (aref (slot-value tree 'buffer) x y)))))
 
-;; the random step can be any position on the grid around a co-ordinate.
-(defun random-step (c)
-  "given a position C, a dotted pair, return the position of a random step"
-  (let ((x (car c))
-        (y (cdr c)))
-    (cons (+ (1- x) (random 3))
-          (+ (1- y) (random 3)))))
+(defun touch-tree? (p tree)
+  "does the point P touch the TREE."
+  (declare (type brownian-tree tree)
+	   (type (simple-vector 2) p))
+  (let ((width (slot-value tree 'width))
+	(height (slot-value tree 'height)))
+    (do ((i 0 (1+ i)))
+	((= i width))
+      (do ((j 0 (1+ j)))
+	  ((= j height))
+	(case (aref (slot-value tree 'buffer) i j)
+	  ((:seed) t)
+	  ((:new) t)
+	  (otherwise nil))))))
+
+;; Need to fix to not step out of the buffer range. how?
+(defun random-step (c tree)
+  "A random step from a given position C for TREE."
+  (declare (type (simple-vector 2) c)
+	   (type brownian-tree tree))
+  (let* ((x (aref c 0))
+	 (y (aref c 1))
+	 (n (vector (+ (1- x) (random 3))
+		    (+ (1- y) (random 3)))))
+    (if (in-bounds? n tree)
+	n
+	#(-1 -1)))) ;; Step gone out of scope
+
+(defun random-step-no-rev (c p)
+  "A random step from the point C but doesn't move back to P."
+  (let ((next-step (random-step c)))
+    (if (equalp p next-step)
+	(random-step-no-rev c p)
+	next-step)))
 
 (defun random-point (tree)
   "return a random point in the range of the tree and not on the tree."
-  (let ((x (cons (random (bt-width tree))
-                 (random (bt-height tree)))))
+  (let ((x (vector (random (slot-value tree 'width))
+		   (random (slot-value tree 'height)))))
     (if (on-tree x tree)
         (random-point tree)
         x)))
 
-(defun update-point (c tree)
-  "update a point C to the tree T"
-  (incf (bt-size tree))
-  (setf (aref (bt-buffer tree)(car c) (cdr c)) (bt-size tree)))
+(defun seed (tree lp)
+  "Initialize the TREE with a list of point LP."
+  (declare (type brownian-tree tree))
+  (mapc (lambda (p)
+	  (set-point tree p (list :seed)))
+	lp))
 
-;; mainly for debugging.
-(defun coverage (tree)
-  "points which are covered by the TREE"
-  (let ((result 0))
-    (do ((x 0 (1+ x)))
-        ((>= x (bt-width tree)))
-      (do ((y 0 (1+ y)))
-          ((>= y (bt-height tree)))
-        (if (> (aref (bt-buffer tree) x y) 0) (incf result))))
-    result))
+(defun set-point (tree point attributes)
+  "Set the value of POINT with ATTRIBUTES in the TREE."
+  (declare (type brownian-tree tree)
+	   (type (simple-vector 2) point))
+  (setf (aref tree (aref point 0) (aref point 1))
+	attributes))
 
-;; TODO
-(defun new-particle (tree)
-  "introduce a particle and if it meets the tree T, update tree T else discard the particle"
-  (let* ((c (random-point tree))
-         (prev-c nil))
-    (loop 
-       :while (and (in-bounds-p c tree)
-                   (not (on-tree c tree)))
-       :do (setq prev-c c)
-       :do (setq c (random-step c)))
-    (cond ((in-bounds-p c tree)
-           (format t ".")
-           (update-point prev-c tree)
-           prev-c)
-          (t nil))))
-
-(defun create-new-tree (&optional 
-			  (size '(1000 1000 2000))
-			  (initial-seed '((500 . 500)))
-			  (bg-color "white"))
-  (let ((x (make-instance 'brownian-tree 
-                          :width (first size)
-                          :height (second size)
-                          :bg-color bg-color))
-        (n (third size)))
-    (dolist (e initial-seed) (update-point e x))
-    (dotimes (i n)
-      (loop :until (new-particle x)))
-    x))
+(defun new-point (tree)
+  "Introduce a new point on the TREE."
+  (declare (type brownian-tree tree))
+  (let ((p (random-point tree)))
+    ;;Now move the particle until it reaches the tree
+    ;;or goes out of bounds.
+    (loop with pos = p
+       until (or (touch-tree? pos) (equalp pos #(-1 -1)))
+       do (setf pos (random-step tree pos))
+       finally (when (touch-tree? pos)
+		 (set-point pos (list :new))))))

@@ -1,0 +1,97 @@
+* Non-local exits in Common Lisp
+Common Lisp doesn't have indefinite extent continuations. CATCH and THROW are closest we have to scheme continuations. Continuations and unwind protect don't interact well with each other.
+
+In the process of searching, we need to return as soon as we found the object.
+#+BEGIN_SRC lisp
+  (defun my-search (s l)
+    (cond ((null l) nil)
+	  ((eql s (car l)) t)
+	  (t (my-search s (cdr l)))))
+  (list (my-search 0 (list 1 2 3))
+	  (my-search 1 (list 1 2 3)))
+#+END_SRC 
+
+#+RESULTS:
+| NIL | T |
+
+In the above function explicit recursion is needed to traverse the list. If we had to use a existing list iterator, how can the function to return be defined?
+
+#+BEGIN_SRC lisp
+  (defun my-search (s l)
+    (block search
+      (mapc (lambda (a)
+	      (when (eql a s)
+		(return-from search t)))
+	    l)
+      nil))
+  (list (my-search 0 (list 1 2 3))
+	(my-search 1 (list 1 2 3)))
+#+END_SRC
+
+#+RESULTS:
+| NIL | T |
+
+Here I've used /block, return-from/ a non local exit procedure available to common lisp. Other non-local exits available are /catch, throw/ and /tagbody, go/.
+block, return-from cannot be used as catch, throw below but the reverse is possible. return-from needs to be within it's corresponding named-block when defined, but throw need not.
+
+#+BEGIN_SRC lisp
+  (defun my-search (v)
+    (lambda (s)
+      (when (eql s v)
+	(throw 'search t))))
+
+  (catch 'search
+    (mapc (my-search 1) (list 1 2 3)))
+#+END_SRC
+
+#+RESULTS:
+: T
+
+/block, return-from/ and /tagbody, go/ are emphasized to be lexical exits an /catch, throw/ is dynamic exit, what is the exact difference? What does /unwind-protect/ do?
+
+#+BEGIN_SRC lisp :results output
+  (progn (print 'start-motor)
+	 (print 'drill)
+	 (print 'stop-motor))
+#+END_SRC
+
+#+RESULTS:
+: 
+: START-MOTOR 
+: DRILL 
+: STOP-MOTOR 
+
+Now what happens when the drilling process has an error? The process throws a non-local exit, which leaves the motor running.
+
+#+BEGIN_SRC lisp :results output
+  (catch 'drill-error
+    (progn (print 'start-motor)
+	   (progn
+	     (print 'drill)
+	     (throw 'drill-error 'broken-drillbit))
+	   (print 'stop-motor)))
+#+END_SRC
+
+#+RESULTS:
+: 
+: START-MOTOR 
+: DRILL 
+
+unwind-protect helps with managing non-local exits by doing some clean up operations.
+
+#+BEGIN_SRC lisp :results output
+  (catch 'drill-error
+    (unwind-protect
+	 (progn (print 'start-motor)
+		(progn (print 'drill)
+		       (throw 'drill-error 'broken-drillbit)))
+      (print 'stop-motor)))
+#+END_SRC
+
+#+RESULTS:
+: 
+: START-MOTOR 
+: DRILL 
+: STOP-MOTOR 
+
+/unwind-protect/ executes the first form and then the second form. Even if a non-local exit is triggered in the first form, control is transferred only after the second form is evaluated.

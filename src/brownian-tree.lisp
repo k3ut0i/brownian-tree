@@ -1,6 +1,7 @@
 (defpackage :brownian-tree
   (:use :cl
-        :svg)
+;        :svg
+	)
   (:export :new-particle
            :brownian-tree
            :update-point
@@ -18,7 +19,11 @@
    (bg-color :initarg :bg-color
              :initform "black"
 	     :type (simple-array * *))
-   (size :initform 0))
+   (size :initform 0)
+   (attributes :type cons
+	       :initform (list :out-of-bounds-count 0
+			       :particle-count 0
+			       :seed-count 0)))	  ; Simple a-list for additional info.
   (:documentation "Brownian Tree Object")
   (:default-initargs :width 1000 :height 1000 :bg-color "black"))
 
@@ -33,13 +38,18 @@
 (defun pprint-buffer (stream buffer
 		      &optional colon amp (delimiter #\Space))
   "Dump BUFFER data."
-  (declare (type (simple-array integer *) buffer)
+  (declare (type (simple-array * *) buffer)
 	   (ignore colon amp)) ;; What am I actually ignoring?
-  (loop :with first-time t
-     :for x :across buffer
-     :unless first-time
-     :do (when delimiter (write-char delimiter stream)) :end
-     :do (princ x stream)))
+  (let* ((dimensions (array-dimensions buffer))
+	 (width (car dimensions))
+	 (height (cadr dimensions)))
+    (dotimes (i width)
+      (dotimes (j height)
+	(princ (if (eql 0 (aref buffer i j))
+		   0
+		   1) stream)
+	(write-char delimiter stream))
+      (write-char #\Linefeed stream))))
 
 					;FIXME: Complete this method
 (defun draw-tree (tree file-name output-type)
@@ -50,13 +60,31 @@
 			:direction :output
 			:if-exists :supersede)
     (case output-type
-      (:lisp-data (format outf "~A" tree))
-      (:netpbm-image (format outf "~' :@/pprint-buffer/"
-			     (slot-value tree 'buffer)))
+      (:lisp-data (format outf "~A" (slot-value tree 'buffer)))
+      (:raw-data (format outf "~/brownian-tree:pprint-buffer/"
+			 (slot-value tree 'buffer)))
+      (:netpbm-image (draw-netpbm-from-tree tree file-name))
       (:svg-image (draw-svg-from-tree tree file-name)))))
+
+(defun draw-netpbm-from-tree (tree file-name)
+  "Draw the image in netpbm format from the TREE to FILE-NAME."
+  (declare (type brownian-tree tree)
+	   (type (simple-array character *) file-name))
+  (with-open-file (outf file-name
+			:direction :output
+			:if-exists :supersede)
+    (let ((image-type "P2")
+	  (width (slot-value tree 'width))
+	  (height (slot-value tree 'height))
+	  (image-depth 255))
+      (format outf "~A~%~A ~A~%~A" image-type width height image-depth)
+      (pprint-buffer outf (slot-value tree 'buffer)))))
 
 (defun draw-svg-from-tree (tree file-name)
   "Draw svg image from the TREE object to FILE-NAME."
+  ;; (declare (type brownian-tree tree)
+  ;; 	   (type ((simple-array character *) file-name)))
+  (declare (ignore tree file-name))
   '())
 
 (defun in-bounds? (c tree)
@@ -69,6 +97,22 @@
               (< x x-max))
          (and (> y 0)
               (< y y-max)))))
+
+(defun neighbors (p)
+  "List the neighbors of a point P."
+  (let* ((lm (list #(-1 0)
+		   #(1 0)
+		   #(0 -1)
+		   #(0 1)
+		   #(1 -1)
+		   #(-1 1)
+		   #(1 1)
+		   #(-1 -1))))
+    (flet ((add (v1 v2)
+	     (vector (+ (aref v1 0) (aref v2 0))
+		     (+ (aref v1 1) (aref v2 1)))))
+      (mapcar (lambda (m) (add m p))
+	      lm))))
 
 ;; does the particle touch the tree?
 (defun on-tree? (c tree)
@@ -83,29 +127,22 @@
   "does the point P touch the TREE."
   (declare (type brownian-tree tree)
 	   (type (simple-vector 2) p))
-  (let ((width (slot-value tree 'width))
-	(height (slot-value tree 'height)))
-    (do ((i 0 (1+ i)))
-	((= i width))
-      (do ((j 0 (1+ j)))
-	  ((= j height))
-	(case (aref (slot-value tree 'buffer) i j)
-	  ((:seed) t)
-	  ((:new) t)
-	  (otherwise nil))))))
+  (search (neighbors p tree) :test)
+  (dolist (np (neighbors p) result)
+    (case (aref (slot-value tree 'buffer) (aref np 0) (aref np 1))
+	 ((:seed) t)
+	 ((:new) t)
+	 (otherwise nil))))
 
 ;; Need to fix to not step out of the buffer range. how?
-(defun random-step (c tree)
+(defun random-step (c)
   "A random step from a given position C for TREE."
-  (declare (type (simple-vector 2) c)
-	   (type brownian-tree tree))
+  (declare (type (simple-vector 2) c))
   (let* ((x (aref c 0))
 	 (y (aref c 1))
 	 (n (vector (+ (1- x) (random 3))
 		    (+ (1- y) (random 3)))))
-    (if (in-bounds? n tree)
-	n
-	#(-1 -1)))) ;; Step gone out of scope
+    n)) ;; Step gone out of scope
 
 (defun random-step-no-rev (c p)
   "A random step from the point C but doesn't move back to P."
@@ -118,7 +155,7 @@
   "return a random point in the range of the tree and not on the tree."
   (let ((x (vector (random (slot-value tree 'width))
 		   (random (slot-value tree 'height)))))
-    (if (on-tree x tree)
+    (if (on-tree? x tree)
         (random-point tree)
         x)))
 
@@ -133,8 +170,10 @@
   "Set the value of POINT with ATTRIBUTES in the TREE."
   (declare (type brownian-tree tree)
 	   (type (simple-vector 2) point))
-  (setf (aref tree (aref point 0) (aref point 1))
-	attributes))
+  (if (in-bounds? point tree)
+      (setf (aref (slot-value tree 'buffer) (aref point 0) (aref point 1))
+	    attributes)
+      (incf (getf (slot-value tree 'attributes) :out-of-bounds-count))))
 
 (defun new-point (tree)
   "Introduce a new point on the TREE."
@@ -143,7 +182,6 @@
     ;;Now move the particle until it reaches the tree
     ;;or goes out of bounds.
     (loop with pos = p
-       until (or (touch-tree? pos) (equalp pos #(-1 -1)))
-       do (setf pos (random-step tree pos))
-       finally (when (touch-tree? pos)
-		 (set-point pos (list :new))))))
+       while (in-bounds? pos tree)
+       until (touch-tree? pos tree)
+       do (setf pos (random-step pos)))))

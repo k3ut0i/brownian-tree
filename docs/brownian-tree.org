@@ -2,7 +2,8 @@
 A program to generate a brownian tree
 ** Problem Statement
 
-** writing the program.
+** writing the program
+
 *** visualization
 visualizing brownian walks worked really well in svg format because they are just a collection of line segments. but brownian tree is a collection of slightly touching particles so the particle must be a circle with just enough radius so it looks touched with it's neighbors.
 a few points to consider.
@@ -12,3 +13,5 @@ a few points to consider.
 *** testing
 Complete test suites for _svg_ _brownian-trails_ and _brownian-tree_ packages.
 Adding new features and debugging the whole project becomes a hassle. When adding a new feature to svg package, add a corresponding test to test-suite and it's taken care off. Jumping between packages takes a lot of time to debug.
+*** logic
+A better visualization of how the tree is being grown can be achieved by a color gradient. So I needed to keep track of how distant each particle is to a seeded value. So one of the attributes that needs to be stored in the buffer is distance from the seed. Each distance can be updated by the return value from _touch-tree?_ function.

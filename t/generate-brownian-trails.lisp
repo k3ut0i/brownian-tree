@@ -2,7 +2,7 @@
 (defpackage :gen-btrails
   (:use :cl
         :svg
-        :brownian-trails)
+        :brownian-tree)
   (:export :generate-btrails-image))
 
 (in-package :gen-btrails)

@@ -19,7 +19,6 @@
    (bg-color :initarg :bg-color
              :initform "black"
 	     :type (simple-array * *))
-   (size :initform 0)
    (attributes :type cons
 	       :initform (list :out-of-bounds-count 0
 			       :particle-count 0
@@ -32,9 +31,19 @@
   (setf (slot-value tree 'buffer)
 	(make-array (list (slot-value tree 'width)
 			  (slot-value tree 'height))
-		    :element-type 'number
-		    :initial-element 0)))
+		    :element-type 'list
+		    :initial-element '())))
 
+(defmethod print-object ((tree brownian-tree) stream)
+  (let* ((attributes (slot-value tree 'attributes))
+	 (width (slot-value tree 'width))
+	 (height (slot-value tree 'height))
+	 (seeds (getf attributes :seed-count))
+	 (particles (getf attributes :particle-count)))
+    (format stream "#<BROWNIAN-TREE SIZE:~Ax~A SEEDS:~A PARTICLES:~A >"
+	    width height seeds particles)))
+
+;; Mostly for debugging purposes.
 (defun pprint-buffer (stream buffer
 		      &optional colon amp (delimiter #\Space))
   "Dump BUFFER data."
@@ -45,9 +54,11 @@
 	 (height (cadr dimensions)))
     (dotimes (i width)
       (dotimes (j height)
-	(princ (if (eql 0 (aref buffer i j))
-		   0
-		   1) stream)
+	(let* ((point (aref buffer i j))
+	       (point-char (cond ((getf point :seed) #\S)
+				 ((getf point :particle) #\P)
+				 (t #\_))))
+	  (princ point-char stream))
 	(write-char delimiter stream))
       (write-char #\Linefeed stream))))
 
@@ -93,12 +104,12 @@
         (y (aref c 1))
         (x-max (slot-value tree 'width))
         (y-max (slot-value tree 'height)))
-    (and (and (> x 0)
+    (and (and (>= x 0)
               (< x x-max))
-         (and (> y 0)
+         (and (>= y 0)
               (< y y-max)))))
 
-(defun neighbors (p)
+(defun neighbors (p tree)
   "List the neighbors of a point P."
   (let* ((lm (list #(-1 0)
 		   #(1 0)
@@ -111,28 +122,27 @@
     (flet ((add (v1 v2)
 	     (vector (+ (aref v1 0) (aref v2 0))
 		     (+ (aref v1 1) (aref v2 1)))))
-      (mapcar (lambda (m) (add m p))
-	      lm))))
+      (let ((nl  (mapcar (lambda (m) (add m p))
+			 lm)))
+	(remove-if-not (lambda (p)
+			 (in-bounds? p tree))
+		       nl)))))
 
-;; does the particle touch the tree?
 (defun on-tree? (c tree)
   "is the point C on the tree T"
   (declare (type (simple-vector 2) c)
 	   (type brownian-tree tree))
   (let ((x (aref c 0))
         (y (aref c 1)))
-    (not (zerop (aref (slot-value tree 'buffer) x y)))))
+    (if (aref (slot-value tree 'buffer) x y) t nil)))
 
 (defun touch-tree? (p tree)
   "does the point P touch the TREE."
   (declare (type brownian-tree tree)
 	   (type (simple-vector 2) p))
-  (search (neighbors p tree) :test)
-  (dolist (np (neighbors p) result)
-    (case (aref (slot-value tree 'buffer) (aref np 0) (aref np 1))
-	 ((:seed) t)
-	 ((:new) t)
-	 (otherwise nil))))
+  (some (lambda (p)
+	  (on-tree? p tree))
+	(neighbors p tree)))
 
 ;; Need to fix to not step out of the buffer range. how?
 (defun random-step (c)
@@ -163,25 +173,36 @@
   "Initialize the TREE with a list of point LP."
   (declare (type brownian-tree tree))
   (mapc (lambda (p)
-	  (set-point tree p (list :seed)))
+	  (set-point tree p (list :seed
+				  (incf (getf (slot-value tree 'attributes)
+					      :seed-count)))))
 	lp))
 
 (defun set-point (tree point attributes)
   "Set the value of POINT with ATTRIBUTES in the TREE."
   (declare (type brownian-tree tree)
 	   (type (simple-vector 2) point))
-  (if (in-bounds? point tree)
-      (setf (aref (slot-value tree 'buffer) (aref point 0) (aref point 1))
-	    attributes)
-      (incf (getf (slot-value tree 'attributes) :out-of-bounds-count))))
+  ;; If  out of bounds we just ignore it
+  (let ((in-bounds (in-bounds? point tree)))
+    (if in-bounds
+	(progn (setf (aref (slot-value tree 'buffer)
+			   (aref point 0) (aref point 1))
+		     attributes)
+	       (when (getf attributes :particle)
+		 (incf (getf (slot-value tree 'attributes) :particle-count))))
+	(incf (getf (slot-value tree 'attributes) :out-of-bounds-count)))
+    in-bounds))
 
 (defun new-point (tree)
   "Introduce a new point on the TREE."
   (declare (type brownian-tree tree))
-  (let ((p (random-point tree)))
+  (let ((p (random-point tree))
+	(num-steps 0))
     ;;Now move the particle until it reaches the tree
     ;;or goes out of bounds.
     (loop with pos = p
        while (in-bounds? pos tree)
        until (touch-tree? pos tree)
-       do (setf pos (random-step pos)))))
+       do (setf pos (random-step pos)
+		num-steps (1+ num-steps))
+       finally (set-point tree pos (list :particle num-steps)))))

@@ -1,7 +1,9 @@
 * Brownian Tree
 A program to generate a brownian tree
 ** Problem Statement
-
+#+BEGIN_EXAMPLE
+Draw a simple process for generating a brownian image tree.
+#+END_EXAMPLE
 ** writing the program
 
 *** visualization

@@ -43,6 +43,7 @@ Does a mathematical process provide a better feature than manual emulation?
 #+RESULTS:
 | 3 | 0 | -1 |
 
+
 For dimensions greater than 2 how can the above process be generalized?
 #+BEGIN_SRC lisp
   (defun random-step (n)
@@ -55,3 +56,6 @@ For dimensions greater than 2 how can the above process be generalized?
       (multiple-value-bind (x y) (floor r 3) ; I need to find the trinary representation of r and return that value normalized 
 	(mapc #'(lambda (v) (1- v))) (list x y))))
 #+END_SRC
+
+** Using Polar co-ordinates
+For a 2d version of this problem, may be we use polar co-ordinates to map natural numbers to points? We always step away from the origin so radius is constant. Only the angle is a random number. so we partition sectors of the unit circle and map them to natural numbers and then role the dice.

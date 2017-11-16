@@ -1,12 +1,4 @@
-(defpackage :svg.object
-  (:use cl)
-  (:export :object
-           :stroke-tag
-           :fill-tag
-           :uid
-           :draw))
-
-(in-package :svg.object)
+(in-package :svg)
 
 ; TODO: complete with all parameters from SVG definition.
 (defclass object ()

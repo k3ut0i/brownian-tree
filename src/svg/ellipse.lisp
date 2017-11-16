@@ -1,9 +1,4 @@
-(defpackage :svg.ellipse
-  (:use :cl
-        :svg.object)
-  (:export :ellipse))
-
-(in-package :svg.ellipse)
+(in-package :svg)
 
 (defclass ellipse (object)
   ((start-tag :accessor start-tag
@@ -27,7 +22,7 @@
                 (rx obj)
                 (ry obj))))
 
-(defmethod svg.object:draw ((obj ellipse))
+(defmethod draw ((obj ellipse))
   (reduce (lambda (a b) (format nil "~A ~A" a b))
           (mapcar (lambda (tag) (funcall tag obj))
                   '(start-tag stroke-tag fill-tag points-tag end-tag))))

@@ -4,6 +4,7 @@
         :svg
 	:prove
 	:tutilities)
+  (:export :test-run-brownian-tree)
   (:import-from :uiop :run-program))
 (in-package :test-brownian-tree)
 
@@ -46,11 +47,11 @@
     (seed-tree tree)
     (mapc #'draw-tree)))
 
-(setf prove:*default-reporter* :tap)
-(plan 2)
-(subtest "empty images"
-  (test-empty-image))
-(subtest "seeded images"
-  (test-seeded-image))
-(finalize)
-(setf prove:*default-reporter* :list)
+(defun test-run-brownian-tree ()
+  (let ((prove:*default-reporter* :fiveam))
+    (plan 2)
+    (subtest "empty images"
+      (test-empty-image))
+    (subtest "seeded images"
+      (test-seeded-image))
+    (finalize)))

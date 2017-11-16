@@ -1,9 +1,4 @@
-(defpackage :svg.path
-  (:use :cl
-        :svg.object)
-  (:export :path))
-
-(in-package :svg.path)
+(in-package :svg)
 
 (defclass path (object)
   ((points :accessor points
@@ -36,7 +31,7 @@
 			     "d=\"~{~A~^ ~}\""
 			     (cons head-string tail-string))))))))
 
-(defmethod svg.object:draw ((obj path))
+(defmethod draw ((obj path))
   (flet ((concat-with-space (a b) (format nil "~A ~A" a b)))
     (reduce #'concat-with-space
 	    (list (start-tag obj)

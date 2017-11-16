@@ -1,9 +1,4 @@
-(defpackage :svg.rect
-  (:use :cl
-        :svg.object)
-  (:export :rect))
-
-(in-package :svg.rect)
+(in-package :svg)
 
 (defclass rect (object)
   ((start-tag :accessor start-tag
@@ -25,7 +20,7 @@
                                  (width obj)
                                  (height obj))))
 
-(defmethod svg.object:draw ((obj rect))
+(defmethod draw ((obj rect))
   (reduce (lambda (a b) (format nil "~A ~A" a b))
           (mapcar (lambda (tag) (funcall tag obj))
                   '(start-tag stroke-tag fill-tag points-tag end-tag))))

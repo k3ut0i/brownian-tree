@@ -1,9 +1,6 @@
 (defpackage :brownian-trails
   (:use :cl
-        :svg
-	:svg.path
-	:svg.text
-	:svg.rect)
+        :svg)
   (:nicknames :btrails)
   (:export :new-particle
            :create-btrails

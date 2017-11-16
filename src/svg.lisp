@@ -1,16 +1,12 @@
 ;;; tools to write a SVG image file.
 (defpackage :svg
-  (:use :cl
-        :svg.object
-        :svg.path
-        :svg.polygon
-        :svg.circle
-        :svg.ellipse)
+  (:use :cl)
   (:export :random-color
            :write-svg-to-file
 	   :objects
 	   :svg-image
-	   ))
+	   ;; From svg/ folder
+	   :circle :ellipse :object :path :polygon :rect :text :draw))
 (in-package :svg)
 
 ;; How do i re-export svg.* files just through (:use :svg)????

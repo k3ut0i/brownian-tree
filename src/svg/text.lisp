@@ -1,9 +1,4 @@
-(defpackage :svg.text
-  (:use :cl
-        :svg.object)
-  (:export :text))
-
-(in-package :svg.text)
+(in-package :svg)
 
 (defclass text (object)
   ((start-tag :accessor start-tag
@@ -30,7 +25,7 @@
                                  (cdr (text-pos obj))))
   (setf (fill-tag obj) (format nil "fill=\"~A\"" (fill-color obj))))
 
-(defmethod svg.object:draw ((obj text))
+(defmethod draw ((obj text))
   (reduce (lambda (a b) (format nil "~A ~A" a b))
           (mapcar (lambda (tag) (funcall tag obj))
                   '(start-tag fill-tag points-tag end-tag content end-text-tag))))

@@ -2,14 +2,8 @@
 (defpackage :test-svg
   (:use :cl
         :prove
-        :svg
-        :svg.text
-        :svg.rect
-        :svg.object
-        :svg.path
-        :svg.polygon
-        :svg.circle
-        :svg.ellipse))
+        :svg)
+  (:export :test-run-svg))
 
 (in-package :test-svg)
 
@@ -166,9 +160,9 @@
                                                      :points (pentagon-points '(30 . 70) 4 pi)
                                                      :stroke-color "steelblue")))))
 
-(defun run-svg-tests ()
+(defun test-run-svg ()
   (let ((prove:*default-reporter* :fiveam))
-    (plan 5)
+    (plan 7)
     (subtest "svg-path"
 	     (mapcar (lambda (c) (is (test-draw-svg-path (car  c)) (cdr c)))
 		     *test-draw-path-cases*))

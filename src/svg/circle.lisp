@@ -1,9 +1,4 @@
-(defpackage :svg.circle
-  (:use :cl
-        :svg.object)
-  (:export :circle))
-
-(in-package :svg.circle)
+(in-package :svg)
 
 (defclass circle (object)
   ((start-tag :accessor start-tag
@@ -25,7 +20,7 @@
                 (cdr (center obj))
                 (radius obj))))
 
-(defmethod svg.object:draw ((obj circle))
+(defmethod draw ((obj circle))
   (reduce (lambda (a b) (format nil "~A ~A" a b))
           (mapcar (lambda (tag) (funcall tag obj))
                   '(start-tag stroke-tag fill-tag points-tag end-tag))))

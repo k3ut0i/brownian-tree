@@ -166,28 +166,30 @@
                                                      :points (pentagon-points '(30 . 70) 4 pi)
                                                      :stroke-color "steelblue")))))
 
-(plan 5)
-(subtest "svg-path"
-  (mapcar (lambda (c) (is (test-draw-svg-path (car  c)) (cdr c)))
-          *test-draw-path-cases*))
-(subtest "svg-polygon"
-  (mapcar (lambda (c) (is (test-draw-svg-polygon (car c)) (cdr c)))
-          *test-draw-polygon-cases*))
-(subtest "svg-circle"
-  (mapcar (lambda (c) (is (test-draw-svg-circle (car c)) (cdr c)))
-          *test-draw-circle-cases*))
-(subtest "svg-ellipse"
-  (mapcar (lambda (c) (is (test-draw-svg-ellipse (car c)) (cdr c)))
-          *test-draw-ellipse-cases*))
-(subtest "svg-rect"
-  (mapcar (lambda (c) (is (test-draw-svg-rect (car c)) (cdr c)))
-          *test-draw-rect-cases*))
-(subtest "svg-text"
-  (mapcar (lambda (c) (is (test-draw-svg-text (car c)) (cdr c)))
-          *test-draw-text-cases*))
+(defun run-svg-tests ()
+  (let ((prove:*default-reporter* :fiveam))
+    (plan 5)
+    (subtest "svg-path"
+	     (mapcar (lambda (c) (is (test-draw-svg-path (car  c)) (cdr c)))
+		     *test-draw-path-cases*))
+    (subtest "svg-polygon"
+	     (mapcar (lambda (c) (is (test-draw-svg-polygon (car c)) (cdr c)))
+		     *test-draw-polygon-cases*))
+    (subtest "svg-circle"
+	     (mapcar (lambda (c) (is (test-draw-svg-circle (car c)) (cdr c)))
+		     *test-draw-circle-cases*))
+    (subtest "svg-ellipse"
+	     (mapcar (lambda (c) (is (test-draw-svg-ellipse (car c)) (cdr c)))
+		     *test-draw-ellipse-cases*))
+    (subtest "svg-rect"
+	     (mapcar (lambda (c) (is (test-draw-svg-rect (car c)) (cdr c)))
+		     *test-draw-rect-cases*))
+    (subtest "svg-text"
+	     (mapcar (lambda (c) (is (test-draw-svg-text (car c)) (cdr c)))
+		     *test-draw-text-cases*))
 
-(subtest "drawing a sample image using all elements"
+    (subtest "drawing a sample image using all elements"
 					; just one for now.
-  (diag "view svg image file \"test-svg-image-out.svg\" and manually check if the image is drawn correctly")
-  (is (test-draw-svg-image (car *test-draw-image-cases*)) nil))
-(finalize)
+	     (diag "view svg image file \"test-svg-image-out.svg\" and manually check if the image is drawn correctly")
+	     (is (test-draw-svg-image (car *test-draw-image-cases*)) nil))
+    (finalize)))

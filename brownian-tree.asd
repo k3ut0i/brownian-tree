@@ -1,9 +1,5 @@
-(in-package :asdf-user)
-(defvar +proj-version+ "0.1.0")
-
 (defsystem "svg"
-  :version +proj-version+
-  
+  :version "0.1.0"  
   :components ((:module "src"
 			:serial t
 			:components ((:file "svg/object")
@@ -16,13 +12,14 @@
 				     (:file "svg")
 				     (:file "color")))))
 (defsystem "brownian-tree"
-  :version +proj-version+
+  :version "0.1.0"
   :depends-on ("svg")
   :components ((:module "src"
-                        :components ((:file "brownian-tree")))))
+                        :components ((:file "brownian-tree")
+				     (:file "draw-brownian-tree")))))
 
 (defsystem "brownian-trails"
-  :version +proj-version+
+  :version "0.1.0"
   :depends-on ("svg")
   :components ((:module "src"
 			:components ((:file "brownian-trails")))))
@@ -33,6 +30,8 @@
 	       "svg"
 	       "prove")
   :components ((:module "t"
-			:components ((:file "test-svg")
+			:serial t
+			:components ((:file "util")
+				     (:file "test-svg")
 				     (:file "generate-brownian-trails")
-				     (:file "new-brownian-tree")))))
+				     (:file "test-brownian-tree")))))

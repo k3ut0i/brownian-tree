@@ -1,11 +1,24 @@
-* STARTED Brownian Tree builder
-This is a common lisp program to visualize Brownian Trees and Random Walk trails with a lot of parameters to search for a visually interesting and appealing image.
+* Brownian Motion
+Some simple visualizations of brownian motion.
 
-A part of the image creation program is written as a separate SVG module, whose capabilities are limited to the requirements of the current project.
+Creating brownian trees is a computationally intensive task which takes a long time for large images. This is more of a prototype implementation. A more efficient implementation with video visuals of growth is in progress.
 
 Few sample brownian-tree images.
+** Brownian Trees
+#+CAPTION: low density sample 100x100 with 500 particles
+[[file:sample_brownian_tree_100x100_500p.png]]
+
+#+CAPTION: hight density samples 1000x1000 with 10000 particles and 5 seeds
+[[file:sample_brownian_tree_1000x1000_10000p.jpg]]
+** Brownian Trails
+Simple connected brownian walks.
+#+CAPTION: sample brownian motion image 120x90 with 5 paths
+#+NAME: low density sample image
 [[file:low-desity-sample.svg][sample 120x90]]
-[[file:sample.png][sample 1200x900]]
+
+#+CAPTION: sample brownian motion image 1200x900
+#+NAME: high density sample image
+[[file:sample_brownian_trails_1200x900.png][sample 1200x900]]
 
 ** TODO Features
 Few sample brownian-trails images.

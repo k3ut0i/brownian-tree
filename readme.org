@@ -1,4 +1,5 @@
 * Brownian Motion
+[[https://travis-ci.org/k3ut0i/brownian-tree.svg?branch=master]]
 Some simple visualizations of brownian motion.
 
 Creating brownian trees is a computationally intensive task which takes a long time for large images. This is more of a prototype implementation. A more efficient implementation with video visuals of growth is in progress.

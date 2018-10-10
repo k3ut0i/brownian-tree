@@ -33,57 +33,10 @@
       (:lisp-data (format outf "~A" (slot-value tree 'buffer)))
       (:raw-data (format outf "~/brownian-tree:pprint-buffer/"
 			 (slot-value tree 'buffer)))
-      (:ppm-image (draw-ppm tree file-name))
-      (:pbm-image (draw-pbm tree file-name))
-      (:pgm-image (draw-pgm tree file-name))
-      (:netpbm-image (draw-netpbm tree file-name))
+      (:ppm-image (draw-netpbm tree file-name :ppm))
+      (:pbm-image (draw-netpbm tree file-name :pbm))
+      (:pgm-image (draw-netpbm tree file-name :pgm))
       (:svg-image (draw-svg-from-tree tree file-name)))))
-
-
-(defun draw-netpbm (tree file-name)
-  "Draw the image in netpbm format from the TREE to FILE-NAME."
-  (declare (type brownian-tree tree)
-	   (type (simple-array character *) file-name))
-  (with-open-file (outf file-name
-			:direction :output
-			:if-exists :supersede)
-    (let ((image-type "P2")
-	  (width (slot-value tree 'width))
-	  (height (slot-value tree 'height))
-	  (image-depth 255)
-	  (particles (getf (slot-value tree 'attributes) :particle-count))
-	  (seeds (getf (slot-value tree 'attributes) :seed-count)))
-      (format outf "~A~%~A ~A~%~A~%" image-type width height image-depth)
-      (dotimes (i width)
-	(dotimes (j height)
-	  (let* ((sval (aref (slot-value tree 'buffer) i j))
-		 (color-val (cond ((null sval) 255)
-				  ((getf sval :seed) 0)
-				  ((getf sval :particle) 0))))
-	    (format outf "~A " color-val)))
-	(princ #\Linefeed outf)))))
-
-(defun draw-pbm (tree file-name)
-  "Draw the image in portable bitmap format from the TREE to FILE-NAME."
-  (declare (type brownian-tree tree)
-	   (type (simple-array character *) file-name))
-  (with-open-file (outf file-name
-			:direction :output
-			:if-exists :supersede)
-    (let ((image-type "P1")
-	  (width (slot-value tree 'width))
-	  (height (slot-value tree 'height)))
-      (format outf "~%~A ~A~%" image-type width height)
-      (dotimes (i width)
-	(dotimes (j height)
-	  (let* ((sval (aref (slot-value tree 'buffer) i j))
-		 (color-val (cond ((null sval) 1)
-				  ((getf sval :seed) 0)
-				  ((getf sval :particle) 0))))
-	    (format outf "~A " color-val)))
-	(princ #\Linefeed outf)))))
-(defun draw-ppm (tree file-name)
-  '())
 
 (defun draw-netpbm (tree file-name netpbm-type)
   (declare (type brownian-tree tree)
@@ -134,4 +87,3 @@
   ;; 	   (type ((simple-array character *) file-name)))
   (declare (ignore tree file-name))
   '())
-

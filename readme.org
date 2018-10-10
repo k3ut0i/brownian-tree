@@ -20,11 +20,11 @@ Simple connected brownian walks.
 #+NAME: high density sample image
 [[file:sample_brownian_trails_1200x900.png][sample 1200x900]]
 
+** Additional Documentation
+For additional information look at [[https://k3ut0i.github.io/brownian-tree][github pages]] website.
+
 ** TODO Features
-Few sample brownian-trails images.
-look at trails-*-svgz images in root folder. gzipped svg image has a lot of variables so it might load the cpu up.
 Try writing the path data to a file and rendering it into svg with javascript or other language with more svg support.
 
 Bugs:
 + [todo] some thing weird going on with path background.
-+ [fixed after using format with ~{ ~} directives] path initialize-instance must not be that nightmare. need to make it more streamlined, or break it into fewer parts if memory insufficient. It might be better to used advanced pretty printing of format.
